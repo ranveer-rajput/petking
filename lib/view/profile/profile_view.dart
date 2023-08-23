@@ -6,17 +6,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:petking/view/home_view.dart';
+import 'package:petking/view/home/home_view.dart';
 
 // ignore: must_be_immutable
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class ProfileView extends StatefulWidget {
+  const ProfileView({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfileViewState extends State<ProfileView> {
   TextEditingController userFullNameController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
 
@@ -35,7 +35,12 @@ class _ProfilePageState extends State<ProfilePage> {
     if (pickedFile == null) {
       return null;
     }
-    const path = "files/img.png";
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) { 
+      return null;
+    }
+    final path = "files/${user.uid}.img.png";
     final file = File(pickedFile!.path);
     final actualFireStrorage = FirebaseStorage.instance.ref().child(path);
     UploadTask uploadTask = actualFireStrorage.putFile(file);
