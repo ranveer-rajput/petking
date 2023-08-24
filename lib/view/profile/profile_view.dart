@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:petking/view/home/home_view.dart';
+import 'package:petking/view/profile/profile_page.dart';
 
 // ignore: must_be_immutable
 class ProfileView extends StatefulWidget {
@@ -37,10 +38,10 @@ class _ProfileViewState extends State<ProfileView> {
     }
 
     User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) { 
+    if (user == null) {
       return null;
     }
-    final path = "files/${user.uid}.img.png";
+    final path = "profile_pic/${user.uid}.img.png";
     final file = File(pickedFile!.path);
     final actualFireStrorage = FirebaseStorage.instance.ref().child(path);
     UploadTask uploadTask = actualFireStrorage.putFile(file);
@@ -192,7 +193,7 @@ class _ProfileViewState extends State<ProfileView> {
               final profilepic = await uploadPic();
               if (profilepic != null) {
                 createProfile(profilepic);
-                Get.offAll(() => const HomePage());
+                Get.offAll(() => const ProfileStorePage());
               }
             },
             child: const Text(

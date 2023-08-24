@@ -15,6 +15,7 @@ class CreateProfile extends StatefulWidget {
 
 class _CreateProfileState extends State<CreateProfile> {
   File? pickedFile;
+
   TextEditingController captionController = TextEditingController();
   void selectPost() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -33,7 +34,8 @@ class _CreateProfileState extends State<CreateProfile> {
     if (user == null) {
       return null;
     }
-    final path = "file/${user.uid}.img.png";
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final path = "posts/img$timestamp";
     final file = File(pickedFile!.path);
     final sndtoFirestore = FirebaseStorage.instance.ref().child(path);
 
@@ -50,9 +52,13 @@ class _CreateProfileState extends State<CreateProfile> {
     if (user == null) {
       return;
     }
-    await FirebaseFirestore.instance.collection("posts").doc(user.uid).set({
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final documentId = "$timestamp";
+    await FirebaseFirestore.instance.collection("posts").doc(documentId).set({
       "caption": caption,
       "post": postLink,
+      "uid": user.uid,
+      "creared_at": FieldValue.serverTimestamp(),
     });
   }
 
