@@ -5,6 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:petking/view/home/home_view.dart';
 
 class CreateProfile extends StatefulWidget {
   const CreateProfile({super.key});
@@ -98,6 +100,7 @@ class _CreateProfileState extends State<CreateProfile> {
                 final postPic = await sendFile();
                 if (postPic != null) {
                   createProfile(postPic);
+                  Get.to(const Home());
                 }
               },
               child: const Text("Create"),

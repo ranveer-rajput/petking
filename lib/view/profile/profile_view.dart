@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
@@ -6,7 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:petking/view/home/home_view.dart';
 import 'package:petking/view/profile/profile_page.dart';
 
 // ignore: must_be_immutable
@@ -190,10 +190,12 @@ class _ProfileViewState extends State<ProfileView> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15))),
             onPressed: () async {
+              log("Profile");
               final profilepic = await uploadPic();
+              log("Profile uploadded");
               if (profilepic != null) {
                 createProfile(profilepic);
-                Get.offAll(() => const ProfileStorePage());
+                Get.off(() => const ProfileStorePage());
               }
             },
             child: const Text(

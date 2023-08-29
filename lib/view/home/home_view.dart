@@ -1,83 +1,58 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:petking/view/home/hoepage.dart';
+import 'package:petking/view/profile/create_profile.dart';
+import 'package:petking/view/profile/profile_page.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Home> createState() => _HomeState();
 }
 
-class _HomePageState extends State<HomePage> {
-  // String email = "";
-  // String fullName = "";
-  String profilePic = '';
-  String username = '';
-  Future fetchData() async {
-    if (FirebaseAuth.instance.currentUser != null) {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      final res =
-          await FirebaseFirestore.instance.collection("users").doc(uid).get();
-      final data = res.data();
-      // email = data!["email"] ?? "";
-      // fullName = data["full_name"] ?? "";
-      profilePic = data!["profilepic"] ?? "";
-      username = data["username"] ?? "";
-      setState(() {});
-    }
-  }
-
+class _HomeState extends State<Home> {
+  var currentIndex = 0;
+  var navBarItems = [
+    const BottomNavigationBarItem(
+      label: "Home",
+      icon: Icon(
+        Icons.home,
+      ),
+    ),
+    const BottomNavigationBarItem(
+      label: "Add post",
+      icon: Icon(
+        Icons.add,
+      ),
+    ),
+    const BottomNavigationBarItem(
+      label: "Profile",
+      icon: Icon(
+        Icons.person,
+      ),
+    ),
+  ];
+  var navBody = [
+    const HomePage(),
+    const CreateProfile(),
+    const ProfileStorePage(),
+  ];
   @override
   Widget build(BuildContext context) {
-    var currentIndex = 0;
     return Scaffold(
-      body: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
         children: [
-          // FutureBuilder(
-          //   future: fetchData(),
-          //   builder: (context, snapshot) {
-          //     return Row(
-          //       children: [
-          //         Container(
-          //           height: 40,
-          //           width: 40,
-          //           decoration: const BoxDecoration(
-          //               shape: BoxShape.circle, color: Colors.amber),
-          //           child: ClipOval(
-          //               child: Image.network(
-          //             profilePic,
-          //             fit: BoxFit.cover,
-          //           )),
-          //         ),
-          //         const SizedBox(
-          //           height: 10,
-          //         ),
-          //         Text(" $username"),
-          //       ],
-          //     );
-          //   },
-          // ),
+          Expanded(child: navBody.elementAt(currentIndex)),
         ],
       ),
-      bottomNavigationBar: CurvedNavigationBar(
-        index: currentIndex,
-        backgroundColor: Colors.transparent,
-        color: const Color.fromARGB(255, 39, 39, 46), // Color of navigation bar
-        buttonBackgroundColor: const Color.fromARGB(
-            255, 62, 40, 30), // Color of the navigation bar button
-        onTap: (index) {
+      bottomNavigationBar: BottomNavigationBar(
+        items: navBarItems,
+        currentIndex: currentIndex,
+        onTap: (value) {
           setState(() {
-            currentIndex = index;
+            currentIndex = value;
           });
         },
-        items: const [
-          Icon(Icons.home, color: Colors.white),
-          Icon(Icons.add, color: Colors.white),
-          Icon(Icons.person, color: Colors.white),
-        ],
       ),
     );
   }
