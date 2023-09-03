@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,17 +6,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:petking/view/profile/profile_page.dart';
+import 'package:petking/view/home/home_view.dart';
 
 // ignore: must_be_immutable
-class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
+class CreateProfile extends StatefulWidget {
+CreateProfile({super.key});
 
   @override
-  State<ProfileView> createState() => _ProfileViewState();
+  State<CreateProfile> createState() => _CreateProfileState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
+class _CreateProfileState extends State<CreateProfile> {
   TextEditingController userFullNameController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
 
@@ -190,12 +189,10 @@ class _ProfileViewState extends State<ProfileView> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15))),
             onPressed: () async {
-              log("Profile");
               final profilepic = await uploadPic();
-              log("Profile uploadded");
               if (profilepic != null) {
                 createProfile(profilepic);
-                Get.off(() => const ProfileStorePage());
+                Get.off(() =>  Home());
               }
             },
             child: const Text(

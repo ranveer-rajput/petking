@@ -1,31 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:petking/auth/email/login_page.dart';
 
+// ignore: must_be_immutable
 class ProfileStorePage extends StatefulWidget {
-  const ProfileStorePage({super.key});
+  ProfileStorePage({Key? key}) : super(key: key);
 
   @override
   State<ProfileStorePage> createState() => _ProfileStorePageState();
 }
 
 class _ProfileStorePageState extends State<ProfileStorePage> {
-  String profilePic = '';
-  String? username;
   List<String?> postPic = [];
   List<String?> postCaption = [];
-  // String? postPic;
-  Future fetchProfileData() async {
+
+  Future<Map<String, dynamic>> fetchProfileData() async {
     if (FirebaseAuth.instance.currentUser == null) {
-      return null;
+      return {};
     }
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final res =
         await FirebaseFirestore.instance.collection("users").doc(uid).get();
     final data = res.data();
-    profilePic = data!["profilepic"] ?? "";
-    username = data["username"] ?? "";
-    setState(() {});
+    String profilePic = data?["profilepic"] ?? "";
+    String userName = data?["username"] ?? "";
+    return {
+      "profilepic": profilePic,
+      "username": userName,
+    };
   }
 
   Future<List<String?>> fetchPostData() async {
@@ -51,56 +55,72 @@ class _ProfileStorePageState extends State<ProfileStorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Get.offAll(LoginPage());
+            },
+            icon: Icon(Icons.logout),
+          )
+        ],
+      ),
       body: Column(
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.14,
+            height: MediaQuery.of(context).size.height * 0.02,
           ),
           FutureBuilder(
             future: fetchProfileData(),
             builder: (context, snapshot) {
+              String? profilePic;
+              String? userName;
+
               if (snapshot.connectionState == ConnectionState.done) {
-                return const CircularProgressIndicator(); // Show loading indicator if still fetching data
-              } else if (snapshot.hasError) {
-                return const Text(
-                    "Error loading profile data"); // Display an error message if there's an error
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 80),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 100,
-                        width: 100,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.amber,
-                        ),
-                        child: ClipOval(
-                          child: Image.network(
-                            profilePic,
-                            fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context,
-                                Object exception, StackTrace? stackTrace) {
-                              return const Icon(Icons
-                                  .error); // Display an error icon if the image loading fails
-                            },
+                if (snapshot.hasError) {
+                  return const Text("Error loading profile data");
+                } else {
+                  profilePic = snapshot.data?["profilepic"];
+                  userName = snapshot.data?["username"];
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 80),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 100,
+                          width: 100,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.amber,
+                          ),
+                          child: ClipOval(
+                            child: Image.network(
+                              profilePic ?? '',
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        " $username",
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
-                );
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Text(
+                          " $userName",
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } else {
+                return const CircularProgressIndicator();
               }
             },
+          ),
+          SizedBox(
+            height: 50,
           ),
           Expanded(
             child: FutureBuilder(

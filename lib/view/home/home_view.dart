@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:petking/view/home/hoepage.dart';
-import 'package:petking/view/profile/create_profile.dart';
+import 'package:petking/view/profile/add_post_caption.dart';
 import 'package:petking/view/profile/profile_page.dart';
 
+// ignore: must_be_immutable
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+   Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -33,9 +34,9 @@ class _HomeState extends State<Home> {
     ),
   ];
   var navBody = [
-    const HomePage(),
-    const CreateProfile(),
-    const ProfileStorePage(),
+     HomePage(),
+     AddPostAndCaption(),
+     ProfileStorePage(),
   ];
   @override
   Widget build(BuildContext context) {

@@ -8,14 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:petking/view/home/home_view.dart';
 
-class CreateProfile extends StatefulWidget {
-  const CreateProfile({super.key});
+// ignore: must_be_immutable
+class AddPostAndCaption extends StatefulWidget {
+   AddPostAndCaption({super.key});
 
   @override
-  State<CreateProfile> createState() => _CreateProfileState();
+  State<AddPostAndCaption> createState() => _AddPostAndCaptionState();
 }
 
-class _CreateProfileState extends State<CreateProfile> {
+class _AddPostAndCaptionState extends State<AddPostAndCaption> {
   File? pickedFile;
 
   TextEditingController captionController = TextEditingController();
@@ -60,7 +61,8 @@ class _CreateProfileState extends State<CreateProfile> {
       "caption": caption,
       "post": postLink,
       "uid": user.uid,
-      "creared_at": FieldValue.serverTimestamp(),
+      "created_at": FieldValue.serverTimestamp(),
+      
     });
   }
 
@@ -100,7 +102,7 @@ class _CreateProfileState extends State<CreateProfile> {
                 final postPic = await sendFile();
                 if (postPic != null) {
                   createProfile(postPic);
-                  Get.to(const Home());
+                  Get.to( Home());
                 }
               },
               child: const Text("Create"),

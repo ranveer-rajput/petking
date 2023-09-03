@@ -4,8 +4,9 @@ import 'package:get/get.dart';
 import 'package:petking/auth/email/signin_page.dart';
 import 'package:petking/view/home/home_view.dart';
 
+// ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -28,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
         UserCredential userCredential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
         if (userCredential.user != null) {
-          Get.off(const Home());
+          Get.off( Home());
         }
       } on FirebaseAuthException catch (ex) {
         if (ex.code == "user-not-found") {
@@ -164,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                           const Text("create An account?"),
                           TextButton(
                             onPressed: () {
-                              Get.off(const SignInPage());
+                              Get.off( SignInPage());
                             },
                             child: const Text(
                               "SignIn",

@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:petking/view/profile/profile_view.dart';
+import 'package:petking/view/profile/create_profil.dart';
 
+// ignore: must_be_immutable
 class SignInPage extends StatefulWidget {
-  const SignInPage({Key? key}) : super(key: key);
+   SignInPage({Key? key}) : super(key: key);
 
   @override
   State<SignInPage> createState() => _SignInPageState();
@@ -41,7 +42,7 @@ class _SignInPageState extends State<SignInPage> {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
         if (userCredential.user != null) {
-          Get.off(const ProfileView());
+          Get.off( CreateProfile());
         }
       } on FirebaseAuthException catch (ex) {
         if (ex.code == "email-already-in-use") {
