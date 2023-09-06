@@ -10,7 +10,7 @@ import 'package:petking/view/home/home_view.dart';
 
 // ignore: must_be_immutable
 class AddPostAndCaption extends StatefulWidget {
-   AddPostAndCaption({super.key});
+  AddPostAndCaption({super.key});
 
   @override
   State<AddPostAndCaption> createState() => _AddPostAndCaptionState();
@@ -55,15 +55,33 @@ class _AddPostAndCaptionState extends State<AddPostAndCaption> {
     if (user == null) {
       return;
     }
+    Map<String, dynamic> userData = await fetchProfileData();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final documentId = "$timestamp";
     await FirebaseFirestore.instance.collection("posts").doc(documentId).set({
       "caption": caption,
       "post": postLink,
       "uid": user.uid,
+      "profilepic": userData["profilepic"],
+      "username": userData["username"],
       "created_at": FieldValue.serverTimestamp(),
-      
     });
+  }
+
+  Future<Map<String, dynamic>> fetchProfileData() async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      return {};
+    }
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final res =
+        await FirebaseFirestore.instance.collection("users").doc(uid).get();
+    final data = res.data();
+    String profilePic = data?["profilepic"] ?? "";
+    String userName = data?["username"] ?? "";
+    return {
+      "profilepic": profilePic,
+      "username": userName,
+    };
   }
 
   @override
@@ -102,7 +120,7 @@ class _AddPostAndCaptionState extends State<AddPostAndCaption> {
                 final postPic = await sendFile();
                 if (postPic != null) {
                   createProfile(postPic);
-                  Get.to( Home());
+                  Get.to(Home());
                 }
               },
               child: const Text("Create"),

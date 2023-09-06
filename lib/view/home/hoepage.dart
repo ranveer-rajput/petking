@@ -3,136 +3,87 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class HomePage extends StatefulWidget {
-  HomePage({super.key});
+class HomePage extends StatelessWidget {
+  HomePage({Key? key}) : super(key: key);
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  List<UserProfile> userprofileList = [];
-  List<UserPost> userPostList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchProfileData();
-    fetchPost();
-  }
-
-  Future<void> fetchProfileData() async {
+  Future<List<UserAllDetail>> fetchAllDetails() async {
+    List<UserAllDetail> userAllDetails = [];
     if (FirebaseAuth.instance.currentUser == null) {
-      return;
+      return userAllDetails;
     }
 
-    final res = await FirebaseFirestore.instance.collection("users").get();
-    for (var doc in res.docs) {
-      var profilePic = doc["profilepic"] as String?;
-      var userName = doc["username"] as String?;
-      if (profilePic != null && userName != null) {
-        userprofileList
-            .add(UserProfile(profilepic: profilePic, username: userName));
-      }
-    }
-    setState(() {});
-  }
-
-  Future<void> fetchPost() async {
-    if (FirebaseAuth.instance.currentUser == null) {
-      return;
-    }
     final res = await FirebaseFirestore.instance.collection("posts").get();
-    for (var i in res.docs) {
-      var caption = i['caption'];
-      var postLink = i['post'];
-      var uid = i['uid'];
-      var createdatTimestam = i['created_at'] as Timestamp;
-      var createdat = createdatTimestam.toDate().toString();
-      userPostList.add(
-        UserPost(
-            postCaption: caption,
-            postLink: postLink,
-            createdat: createdat,
-            uId: uid),
+    for (var doc in res.docs) {
+      UserAllDetail userAllDetail = UserAllDetail(
+        profilepic: doc['profilepic'],
+        username: doc['username'],
+        postCaption: doc['caption'],
+        postLink: doc['post'],
       );
+      userAllDetails.add(userAllDetail);
     }
-    setState(() {});
+    return userAllDetails;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          if (userprofileList.isEmpty)
-            const CircularProgressIndicator() // Show loading indicator
-          else
-            Expanded(
-              child: ListView.builder(
-                itemCount: userprofileList.length,
-                itemBuilder: (context, index) {
-                  return Row(
-                    children: [
-                      SizedBox(
-                        height: 50,
-                        width: 50,
-                        child: ClipOval(
-                          child: Image.network(
-                            userprofileList[index].profilepic,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons
-                                  .error); // Show error icon if image loading fails
-                            },
-                          ),
-                        ),
-                      ),
-                      Text(userprofileList[index].username),
-                    ],
-                  );
-                },
-              ),
-            ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: userPostList.length,
+      appBar: AppBar(
+        title: Text("User Posts"),
+      ),
+      body: FutureBuilder<List<UserAllDetail>>(
+        future: fetchAllDetails(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No data available."));
+          } else {
+            List<UserAllDetail> userAllDetails = snapshot.data!;
+            return ListView.builder(
+              itemCount: userAllDetails.length,
               itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: ClipOval(
-                        child: Image.network(userPostList[index].postLink),
+                return Card(
+                  margin: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(userAllDetails[index].profilepic),
+                        ),
+                        title: Text(userAllDetails[index].username),
                       ),
-                    ),
-                    Text(userPostList[index].postCaption),
-                    Text(userPostList[index].createdat),
-                  ],
+                      Image.network(userAllDetails[index].postLink),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(userAllDetails[index].postCaption),
+                      ),
+                    ],
+                  ),
                 );
               },
-            ),
-          )
-        ],
+            );
+          }
+        },
       ),
     );
   }
 }
 
-class UserProfile {
+class UserAllDetail {
   final String profilepic;
   final String username;
-  UserProfile({required this.profilepic, required this.username});
-}
-
-class UserPost {
   final String postCaption;
   final String postLink;
-  final String uId;
-  final String createdat;
-  UserPost(
-      {required this.postCaption,
-      required this.postLink,
-      required this.createdat,
-      required this.uId});
+
+  UserAllDetail({
+    required this.profilepic,
+    required this.username,
+    required this.postCaption,
+    required this.postLink,
+  });
 }
